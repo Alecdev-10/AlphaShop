@@ -149,9 +149,9 @@ MEDIA_ROOT = BASE_DIR / "media"
 # configured (production). Locally, without Cloudinary credentials, media
 # falls back to the filesystem so the app runs without a cloud account.
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
-    "API_KEY": os.environ.get("CLOUDINARY_API_KEY", ""),
-    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", ""),
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", "").strip(),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY", "").strip(),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", "").strip(),
 }
 
 USE_CLOUDINARY = bool(CLOUDINARY_STORAGE["CLOUD_NAME"])
