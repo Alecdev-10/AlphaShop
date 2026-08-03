@@ -18,6 +18,9 @@ db.sqlite3
 # Media uploads
 media/
 
+# Collected static files (build artifact)
+staticfiles/
+
 # IDE
 .vscode/
 .idea/

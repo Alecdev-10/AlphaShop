@@ -1,19 +1,13 @@
 import os
-import dj_database_url
-from django.core.files.storage import FileSystemStorage
-
-STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
 from pathlib import Path
+
+import dj_database_url
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -27,7 +21,7 @@ SECRET_KEY = os.environ.get(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get(
     'DEBUG',
-    'True'
+    'False'
 ) =='True'
 
 ALLOWED_HOSTS = os.environ.get(
@@ -35,19 +29,32 @@ ALLOWED_HOSTS = os.environ.get(
     '127.0.0.1,localhost'
 ).split(',')
 
+# Render sets this automatically for every deploy; trust it without requiring
+# the exact *.onrender.com hostname to be hand-configured in ALLOWED_HOSTS.
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
 
 # Application definition
 
 INSTALLED_APPS = [
-    
+
     'marketPlace',
-    
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+
+    # Listed after staticfiles (not before, as Cloudinary's own docs
+    # suggest) so Django/WhiteNoise's own collectstatic command wins for
+    # static assets — Cloudinary is only used here as the storage backend
+    # for MEDIA (product images), not for static files.
     'django.contrib.staticfiles',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -138,13 +145,32 @@ STATICFILES_DIRS = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Product images are stored on Cloudinary when CLOUDINARY_CLOUD_NAME is
+# configured (production). Locally, without Cloudinary credentials, media
+# falls back to the filesystem so the app runs without a cloud account.
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY", ""),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", ""),
+}
+
+USE_CLOUDINARY = bool(CLOUDINARY_STORAGE["CLOUD_NAME"])
+
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-        "OPTIONS": {
-            "location": MEDIA_ROOT,
-            "base_url": MEDIA_URL,
-        },
+        "BACKEND": (
+            "cloudinary_storage.storage.MediaCloudinaryStorage"
+            if USE_CLOUDINARY
+            else "django.core.files.storage.FileSystemStorage"
+        ),
+        "OPTIONS": (
+            {}
+            if USE_CLOUDINARY
+            else {
+                "location": MEDIA_ROOT,
+                "base_url": MEDIA_URL,
+            }
+        ),
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
@@ -158,3 +184,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 csrf_origins = os.environ.get("CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in csrf_origins.split(",")] if csrf_origins else []
+
+if RENDER_EXTERNAL_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
