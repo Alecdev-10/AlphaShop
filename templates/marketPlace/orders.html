@@ -6,148 +6,154 @@ My Orders | AlphaShop
 
 {% block content %}
 
-<div class="container">
+<div class="breadcrumbs">
 
-    <div class="page-header">
+    <a href="{% url 'product_list' %}">Products</a>
+    <i class="fa-solid fa-chevron-right" style="font-size:.7rem;"></i>
+    <span class="current">My Orders</span>
 
-        <h1>My Orders</h1>
+</div>
 
-        <p>View all your previous purchases.</p>
+<div class="page-header mb-4">
 
-    </div>
+    <h1 class="section-title" style="margin-bottom:8px;">My Orders</h1>
 
-    {% if orders %}
+    <p class="text-center">View all your previous purchases.</p>
 
-        {% for order in orders %}
+</div>
 
-            <div class="order-card">
+{% if orders %}
 
-                <div class="order-header">
+    {% for order in orders %}
 
-                    <div>
+        <div class="order-card">
 
-                        <h3>Order #{{ order.id }}</h3>
+            <div class="order-header">
 
-                        <small>{{ order.createdAt|date:"d M Y - H:i" }}</small>
+                <div>
 
-                    </div>
+                    <h3>Order #{{ order.id }}</h3>
 
-                    <div>
-
-                        {% if order.status == "PENDING" %}
-
-                            <span class="badge badge-warning">
-                                Pending
-                            </span>
-
-                        {% elif order.status == "PAID" %}
-
-                            <span class="badge badge-success">
-                                Paid
-                            </span>
-
-                        {% else %}
-
-                            <span class="badge badge-danger">
-                                Cancelled
-                            </span>
-
-                        {% endif %}
-
-                    </div>
+                    <small>{{ order.createdAt|date:"d M Y - H:i" }}</small>
 
                 </div>
 
-                <div class="order-items">
+                <div>
 
-                    {% for item in order.items.all %}
+                    {% if order.status == "PENDING" %}
 
-                        <div class="order-item">
+                        <span class="badge badge-warning">
+                            Pending
+                        </span>
 
-                            <div>
+                    {% elif order.status == "PAID" %}
 
-                                <strong>
+                        <span class="badge badge-success">
+                            Paid
+                        </span>
 
-                                    {% if item.product %}
-                                        {{ item.product.name }}
-                                    {% else %}
-                                        Deleted Product
-                                    {% endif %}
+                    {% else %}
 
-                                </strong>
+                        <span class="badge badge-danger">
+                            Cancelled
+                        </span>
 
-                                <br>
-
-                                <small>
-
-                                    Quantity:
-                                    {{ item.quantity }}
-
-                                </small>
-
-                            </div>
-
-                            <div class="text-end">
-
-                                <div>
-
-                                    ${{ item.price }}
-
-                                </div>
-
-                                <strong>
-
-                                    ${{ item.subtotal }}
-
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                    {% endfor %}
-
-                </div>
-
-                <div class="order-footer">
-
-                    <strong>
-
-                        Total :
-                        ${{ order.total }}
-
-                    </strong>
+                    {% endif %}
 
                 </div>
 
             </div>
 
-        {% endfor %}
+            <div class="order-items">
 
-    {% else %}
+                {% for item in order.items.all %}
 
-        <div class="empty-state">
+                    <div class="order-item">
 
-            <h2>No orders yet</h2>
+                        <div>
 
-            <p>
+                            <strong>
 
-                You haven't placed any orders yet.
+                                {% if item.product %}
+                                    {{ item.product.name }}
+                                {% else %}
+                                    Deleted Product
+                                {% endif %}
 
-            </p>
+                            </strong>
 
-            <a
-                href="{% url 'product_list' %}"
-                class="btn btn-primary">
+                            <br>
 
-                Continue Shopping
+                            <small>
 
-            </a>
+                                Quantity:
+                                {{ item.quantity }}
+
+                            </small>
+
+                        </div>
+
+                        <div class="text-end">
+
+                            <div>
+
+                                ${{ item.price }}
+
+                            </div>
+
+                            <strong>
+
+                                ${{ item.subtotal }}
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="order-footer">
+
+                <strong>
+
+                    Total :
+                    ${{ order.total }}
+
+                </strong>
+
+            </div>
 
         </div>
 
-    {% endif %}
+    {% endfor %}
 
-</div>
+{% else %}
+
+    <div class="empty-state">
+
+        <i class="fa-solid fa-receipt"></i>
+
+        <h2>No orders yet</h2>
+
+        <p>
+
+            You haven't placed any orders yet.
+
+        </p>
+
+        <a
+            href="{% url 'product_list' %}"
+            class="btn btn-primary">
+
+            Continue Shopping
+
+        </a>
+
+    </div>
+
+{% endif %}
 
 {% endblock %}

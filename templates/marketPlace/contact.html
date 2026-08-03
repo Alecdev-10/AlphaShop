@@ -1,0 +1,127 @@
+{% extends 'marketPlace/base.html' %}
+{% load static %}
+
+{% block title %}
+Contact Us | AlphaShop
+{% endblock %}
+
+{% block content %}
+
+<section class="section">
+
+    <div class="breadcrumbs">
+
+        <a href="{% url 'product_list' %}">Products</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:.7rem;"></i>
+        <span class="current">Contact</span>
+
+    </div>
+
+    <h1 class="section-title">Get in Touch</h1>
+
+    <div class="contact-layout">
+
+        <div class="contact-info-card">
+
+            <h2>Contact information</h2>
+
+            <p>
+                Have a question about an order, a product, or anything else?
+                Reach out and we'll get back to you as soon as possible.
+            </p>
+
+            <div class="contact-info-item">
+
+                <i class="fa-solid fa-envelope"></i>
+
+                <div>
+                    <h4>Email</h4>
+                    <span>support@alphashop.example</span>
+                </div>
+
+            </div>
+
+            <div class="contact-info-item">
+
+                <i class="fa-solid fa-phone"></i>
+
+                <div>
+                    <h4>Phone</h4>
+                    <span>+1 (555) 010-2024</span>
+                </div>
+
+            </div>
+
+            <div class="contact-info-item">
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <div>
+                    <h4>Location</h4>
+                    <span>Remote-first &middot; Shipping worldwide</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="contact-form-card">
+
+            <h2>Send us a message</h2>
+
+            <p>We usually reply within one business day.</p>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        {{ form.name.label_tag }}
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <small class="text-danger">{{ form.name.errors|join:", " }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.email.label_tag }}
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <small class="text-danger">{{ form.email.errors|join:", " }}</small>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    {{ form.subject.label_tag }}
+                    {{ form.subject }}
+                    {% if form.subject.errors %}
+                        <small class="text-danger">{{ form.subject.errors|join:", " }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    {{ form.message.label_tag }}
+                    {{ form.message }}
+                    {% if form.message.errors %}
+                        <small class="text-danger">{{ form.message.errors|join:", " }}</small>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    Send Message
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

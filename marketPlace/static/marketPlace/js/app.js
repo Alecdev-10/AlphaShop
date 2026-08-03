@@ -21,51 +21,149 @@ if (menuBtn && navMenu) {
 // Auto Hide Django Messages
 // =========================
 
+function dismissAlert(alert) {
+
+    alert.style.transition = "0.4s";
+
+    alert.style.opacity = "0";
+
+    alert.style.transform = "translateY(-10px)";
+
+    setTimeout(() => {
+
+        alert.remove();
+
+    }, 400);
+
+}
+
 const alerts = document.querySelectorAll(".alert");
 
 alerts.forEach(alert => {
 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
 
-        alert.style.transition = "0.4s";
-
-        alert.style.opacity = "0";
-
-        alert.style.transform = "translateY(-10px)";
-
-        setTimeout(() => {
-
-            alert.remove();
-
-        }, 400);
+        dismissAlert(alert);
 
     }, 3500);
+
+    const closeBtn = alert.querySelector(".alert-close");
+
+    if (closeBtn) {
+
+        closeBtn.addEventListener("click", () => {
+
+            clearTimeout(timer);
+
+            dismissAlert(alert);
+
+        });
+
+    }
 
 });
 
 
 
 // =========================
-// Confirm Delete
+// Account Dropdown
 // =========================
 
-const deleteButtons = document.querySelectorAll(".remove-btn");
+const accountMenu = document.getElementById("accountMenu");
+const accountTrigger = document.getElementById("accountTrigger");
 
-deleteButtons.forEach(button => {
+if (accountMenu && accountTrigger) {
 
-    button.addEventListener("click", function (event) {
+    accountTrigger.addEventListener("click", (event) => {
 
-        const confirmDelete = confirm(
-            "Remove this product from your cart ?"
-        );
+        event.stopPropagation();
 
-        if (!confirmDelete) {
+        accountMenu.classList.toggle("active");
 
-            event.preventDefault();
+    });
+
+    document.addEventListener("click", (event) => {
+
+        if (!accountMenu.contains(event.target)) {
+
+            accountMenu.classList.remove("active");
 
         }
 
     });
+
+    document.addEventListener("keydown", (event) => {
+
+        if (event.key === "Escape") {
+
+            accountMenu.classList.remove("active");
+
+        }
+
+    });
+
+}
+
+
+
+// =========================
+// Confirm Delete (custom modal)
+// =========================
+
+const confirmModal = document.createElement("div");
+
+confirmModal.className = "confirm-modal";
+
+confirmModal.innerHTML = `
+    <div class="confirm-modal-box">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <h3>Remove this item?</h3>
+        <p>This product will be removed from your cart.</p>
+        <div class="confirm-modal-actions">
+            <button type="button" class="btn btn-secondary" data-action="cancel">Cancel</button>
+            <a href="#" class="btn btn-danger" data-action="confirm">Remove</a>
+        </div>
+    </div>
+`;
+
+document.body.appendChild(confirmModal);
+
+const confirmLink = confirmModal.querySelector("[data-action='confirm']");
+const cancelBtn = confirmModal.querySelector("[data-action='cancel']");
+
+function closeConfirmModal() {
+    confirmModal.classList.remove("active");
+}
+
+document.querySelectorAll(".remove-btn").forEach(button => {
+
+    button.addEventListener("click", function (event) {
+
+        event.preventDefault();
+
+        confirmLink.setAttribute("href", button.getAttribute("href"));
+
+        confirmModal.classList.add("active");
+
+    });
+
+});
+
+cancelBtn.addEventListener("click", closeConfirmModal);
+
+confirmModal.addEventListener("click", (event) => {
+
+    if (event.target === confirmModal) {
+        closeConfirmModal();
+    }
+
+});
+
+document.addEventListener("keydown", (event) => {
+
+    if (event.key === "Escape") {
+        closeConfirmModal();
+    }
 
 });
 
@@ -178,6 +276,35 @@ if (imageInput && imagePreview) {
     });
 
 }
+
+
+
+// =========================
+// Quantity Stepper (product detail)
+// =========================
+
+document.querySelectorAll(".quantity-selector").forEach(selector => {
+
+    const input = selector.querySelector("input[type='number']");
+
+    selector.querySelectorAll("[data-step]").forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            if (!input) return;
+
+            const step = parseInt(button.dataset.step, 10);
+            const min = parseInt(input.min || "1", 10);
+            const max = parseInt(input.max || "9999", 10);
+            const current = parseInt(input.value || "1", 10);
+
+            input.value = Math.min(max, Math.max(min, current + step));
+
+        });
+
+    });
+
+});
 
 
 

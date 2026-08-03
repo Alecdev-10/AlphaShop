@@ -9,6 +9,14 @@
 
 <section class="section">
 
+    <div class="breadcrumbs">
+
+        <a href="{% url 'product_list' %}">Products</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:.7rem;"></i>
+        <span class="current">{{ product.name }}</span>
+
+    </div>
+
     <div class="product-detail">
 
         <div class="product-detail-image">
@@ -33,6 +41,10 @@
 
 
         <div class="product-detail-content">
+
+            {% if product.isNew %}
+                <span class="badge badge-primary mb-2">New arrival</span>
+            {% endif %}
 
             <h1>
 
@@ -71,7 +83,7 @@
             </p>
 
 
-            <div class="d-flex mt-4" style="gap:15px;flex-wrap:wrap;">
+            <div class="d-flex mt-4" style="gap:15px;flex-wrap:wrap;align-items:center;">
 
                 <a
                     href="{% url 'product_list' %}"
@@ -88,16 +100,27 @@
 
                     {% if product.stock > 0 %}
 
-                        <a
-                            href="{% url 'add_to_cart' product.id %}"
-                            class="btn btn-primary"
-                        >
+                        <form action="{% url 'add_to_cart' product.id %}" method="GET" class="d-flex" style="gap:15px;align-items:center;flex-wrap:wrap;">
 
-                            <i class="fa-solid fa-cart-shopping"></i>
+                            <div class="quantity-selector">
 
-                            Add to Cart
+                                <button type="button" class="quantity-btn" data-step="-1">-</button>
 
-                        </a>
+                                <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}">
+
+                                <button type="button" class="quantity-btn" data-step="1">+</button>
+
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+
+                                <i class="fa-solid fa-cart-shopping"></i>
+
+                                Add to Cart
+
+                            </button>
+
+                        </form>
 
                     {% endif %}
 
@@ -121,6 +144,62 @@
         </div>
 
     </div>
+
+    {% if relatedProducts %}
+
+    <div class="related-products">
+
+        <h2 class="section-title">You may also like</h2>
+
+        <div class="product-grid">
+
+            {% for related in relatedProducts %}
+
+            <div class="product-card">
+
+                <div class="product-image">
+
+                    {% if related.isNew %}
+                        <span class="new-badge">New</span>
+                    {% endif %}
+
+                    {% if related.image %}
+
+                        <img src="{{ related.image.url }}" alt="{{ related.name }}">
+
+                    {% else %}
+
+                        <img src="{% static 'marketPlace/images/no-image.png' %}" alt="No image">
+
+                    {% endif %}
+
+                </div>
+
+                <div class="product-body">
+
+                    <h3 class="product-title">{{ related.name }}</h3>
+
+                    <p class="product-price">${{ related.price }}</p>
+
+                    <div class="product-actions mt-2">
+
+                        <a href="{% url 'product_detail' related.slug %}" class="btn btn-secondary w-100">
+                            View Details
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
 
 </section>
 

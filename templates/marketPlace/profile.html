@@ -1,0 +1,140 @@
+{% extends 'marketPlace/base.html' %}
+{% load static %}
+
+{% block title %}
+My Profile | AlphaShop
+{% endblock %}
+
+{% block content %}
+
+<div class="breadcrumbs">
+
+    <a href="{% url 'product_list' %}">Products</a>
+    <i class="fa-solid fa-chevron-right" style="font-size:.7rem;"></i>
+    <span class="current">My Profile</span>
+
+</div>
+
+<h1 class="section-title">My Profile</h1>
+
+<div class="profile-layout">
+
+    <aside class="profile-sidebar">
+
+        <div class="profile-avatar">
+            {{ user.username|slice:":1"|upper }}
+        </div>
+
+        <h3>{{ user.username }}</h3>
+
+        <p>{{ user.email|default:"No email on file" }}</p>
+
+        <div class="profile-stats">
+
+            <div class="profile-stat">
+                <strong>{{ ordersCount }}</strong>
+                <span>Orders</span>
+            </div>
+
+            <div class="profile-stat">
+                <strong>{{ user.date_joined|date:"Y" }}</strong>
+                <span>Member since</span>
+            </div>
+
+        </div>
+
+    </aside>
+
+    <div>
+
+        <div class="profile-card">
+
+            <h3><i class="fa-solid fa-user"></i> Personal Information</h3>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <input type="hidden" name="update_profile" value="1">
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        {{ profileForm.first_name.label_tag }}
+                        {{ profileForm.first_name }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ profileForm.last_name.label_tag }}
+                        {{ profileForm.last_name }}
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    {{ profileForm.email.label_tag }}
+                    {{ profileForm.email }}
+                    {% if profileForm.email.errors %}
+                        <small class="text-danger">{{ profileForm.email.errors|join:", " }}</small>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Save Changes
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="profile-card">
+
+            <h3><i class="fa-solid fa-lock"></i> Change Password</h3>
+
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="form-group">
+                    {{ passwordForm.old_password.label_tag }}
+                    {{ passwordForm.old_password }}
+                    {% if passwordForm.old_password.errors %}
+                        <small class="text-danger">{{ passwordForm.old_password.errors|join:", " }}</small>
+                    {% endif %}
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        {{ passwordForm.new_password1.label_tag }}
+                        {{ passwordForm.new_password1 }}
+                        {% if passwordForm.new_password1.errors %}
+                            <small class="text-danger">{{ passwordForm.new_password1.errors|join:", " }}</small>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ passwordForm.new_password2.label_tag }}
+                        {{ passwordForm.new_password2 }}
+                        {% if passwordForm.new_password2.errors %}
+                            <small class="text-danger">{{ passwordForm.new_password2.errors|join:", " }}</small>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-key"></i>
+                    Update Password
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

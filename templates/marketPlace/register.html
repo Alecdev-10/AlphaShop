@@ -1,4 +1,5 @@
 {% extends 'marketPlace/base.html' %}
+{% load static %}
 
 {% block title %}
 Register | AlphaShop
@@ -6,70 +7,88 @@ Register | AlphaShop
 
 {% block content %}
 
-<div class="form-container">
+<div class="auth-split">
 
-    <h2 class="form-title">
+    <div class="auth-image">
 
-        Create Your Account
+        <img src="{% static 'marketPlace/images/auth-side.jpg' %}" alt="AlphaShop">
 
-    </h2>
+        <div class="auth-image-overlay">
 
-    <form method="POST">
+            <h2>Join AlphaShop today</h2>
 
-        {% csrf_token %}
+            <p>Create an account to start shopping the latest tech gadgets at great prices.</p>
 
-        {% for field in form %}
+        </div>
 
-            <div class="form-group">
+    </div>
 
-                <label>
+    <div class="auth-form-side">
 
-                    {{ field.label }}
+        <h2 class="form-title">
 
-                </label>
+            Create Your Account
 
-                {{ field }}
+        </h2>
 
-                {% if field.errors %}
-
-                    <small class="text-danger">
-
-                        {{ field.errors|join:", " }}
-
-                    </small>
-
-                {% endif %}
-
-            </div>
-
-        {% endfor %}
-
-        <button
-            type="submit"
-            class="btn btn-primary w-100"
-        >
-
-            <i class="fa-solid fa-user-plus"></i>
-
-            Create Account
-
-        </button>
-
-    </form>
-
-    <div class="form-footer">
-
-        <p>
-
-            Already have an account?
-
-            <a href="{% url 'login' %}">
-
-                Login here
-
-            </a>
-
+        <p class="auth-subtitle">
+            It only takes a minute to get started.
         </p>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% for field in form %}
+
+                <div class="form-group">
+
+                    {{ field.label_tag }}
+
+                    {{ field }}
+
+                    {% if field.errors %}
+
+                        <small class="text-danger">
+
+                            {{ field.errors|join:", " }}
+
+                        </small>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+            <button
+                type="submit"
+                class="btn btn-primary w-100"
+            >
+
+                <i class="fa-solid fa-user-plus"></i>
+
+                Create Account
+
+            </button>
+
+        </form>
+
+        <div class="form-footer">
+
+            <p>
+
+                Already have an account?
+
+                <a href="{% url 'login' %}">
+
+                    Login here
+
+                </a>
+
+            </p>
+
+        </div>
 
     </div>
 

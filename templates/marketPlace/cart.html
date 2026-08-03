@@ -7,6 +7,14 @@ My Cart | AlphaShop
 
 {% block content %}
 
+<div class="breadcrumbs">
+
+    <a href="{% url 'product_list' %}">Products</a>
+    <i class="fa-solid fa-chevron-right" style="font-size:.7rem;"></i>
+    <span class="current">Shopping Cart</span>
+
+</div>
+
 <h1 class="section-title">
 
     Shopping Cart
@@ -181,7 +189,8 @@ My Cart | AlphaShop
 
         <a
             href="{% url 'product_list' %}"
-            class="btn btn-primary mt-3"
+            class="btn btn-secondary mt-3 w-100"
+            style="text-align:center;"
         >
 
             Continue Shopping
@@ -220,6 +229,54 @@ My Cart | AlphaShop
     </a>
 
 </div>
+
+{% if recommended %}
+
+<div class="related-products">
+
+    <h2 class="section-title">You might like</h2>
+
+    <div class="product-grid">
+
+        {% for product in recommended %}
+
+        <div class="product-card">
+
+            <div class="product-image">
+
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <img src="{% static 'marketPlace/images/no-image.png' %}" alt="No image">
+                {% endif %}
+
+            </div>
+
+            <div class="product-body">
+
+                <h3 class="product-title">{{ product.name }}</h3>
+
+                <p class="product-price">${{ product.price }}</p>
+
+                <div class="product-actions mt-2">
+
+                    <a href="{% url 'product_detail' product.slug %}" class="btn btn-secondary w-100">
+                        View Details
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endif %}
 
 {% endif %}
 

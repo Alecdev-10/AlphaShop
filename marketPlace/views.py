@@ -16,19 +16,65 @@ from django.contrib.auth import (
     logout
 )
 
-from .forms import RegisterForm
+from .forms import (
+    RegisterForm,
+    ProfileForm,
+    ContactForm,
+    NewsletterForm
+)
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.db import transaction
+
+
+PRODUCTS_PER_PAGE = 8
 
 
 def productList(request):
 
     products = Product.objects.all()
 
+    query = request.GET.get("q", "").strip()
+
+    if query:
+
+        products = products.filter(
+
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+
+        )
+
+    sort = request.GET.get("sort", "newest")
+
+    sort_map = {
+        "newest": "-createdAt",
+        "price_asc": "price",
+        "price_desc": "-price",
+        "name": "name",
+    }
+
+    products = products.order_by(sort_map.get(sort, "-createdAt"))
+
+    paginator = Paginator(products, PRODUCTS_PER_PAGE)
+
+    page = paginator.get_page(request.GET.get("page"))
+
     context = {
 
-        "products": products
+        "products": page,
+
+        "page_obj": page,
+
+        "query": query,
+
+        "sort": sort,
+
+        "total_count": paginator.count,
 
     }
 
@@ -54,9 +100,21 @@ def productDetail(request, slug):
 
     )
 
+    relatedProducts = (
+
+        Product.objects
+
+        .exclude(id=product.id)
+
+        .order_by("-createdAt")[:4]
+
+    )
+
     context = {
 
-        "product": product
+        "product": product,
+
+        "relatedProducts": relatedProducts
 
     }
 
@@ -199,6 +257,12 @@ def showCart(request):
 
     ).first()
 
+    recommended = (
+        Product.objects
+        .filter(stock__gt=0)
+        .order_by("-createdAt")[:4]
+    )
+
     return render(
 
         request,
@@ -207,7 +271,9 @@ def showCart(request):
 
         {
 
-            "cart": cart
+            "cart": cart,
+
+            "recommended": recommended
 
         }
 
@@ -225,6 +291,13 @@ def addToCart(request, productId):
         id=productId
 
     )
+
+    try:
+        requestedQuantity = int(request.POST.get("quantity") or request.GET.get("quantity") or 1)
+    except ValueError:
+        requestedQuantity = 1
+
+    requestedQuantity = max(1, requestedQuantity)
 
     if product.stock <= 0:
 
@@ -259,12 +332,14 @@ def addToCart(request, productId):
         product=product
 
     ).first()
-    
+
     if item:
 
-        if item.quantity < product.stock:
+        newQuantity = item.quantity + requestedQuantity
 
-            item.quantity += 1
+        if newQuantity <= product.stock:
+
+            item.quantity = newQuantity
 
             item.save()
 
@@ -288,7 +363,7 @@ def addToCart(request, productId):
 
             product=product,
 
-            quantity=1
+            quantity=min(requestedQuantity, product.stock)
 
         )
 
@@ -489,3 +564,110 @@ def orderList(request):
         }
 
     )
+
+
+def _stylePasswordForm(form):
+
+    for field in form.fields.values():
+        field.widget.attrs.update({"class": "form-control"})
+
+    return form
+
+
+@login_required
+def profile(request):
+
+    if request.method == "POST":
+
+        if "update_profile" in request.POST:
+
+            profileForm = ProfileForm(request.POST, instance=request.user)
+            passwordForm = _stylePasswordForm(PasswordChangeForm(request.user))
+
+            if profileForm.is_valid():
+
+                profileForm.save()
+
+                messages.success(request, "Profile updated successfully.")
+
+                return redirect("profile")
+
+        else:
+
+            profileForm = ProfileForm(instance=request.user)
+            passwordForm = _stylePasswordForm(PasswordChangeForm(request.user, request.POST))
+
+            if passwordForm.is_valid():
+
+                user = passwordForm.save()
+
+                update_session_auth_hash(request, user)
+
+                messages.success(request, "Password changed successfully.")
+
+                return redirect("profile")
+
+    else:
+
+        profileForm = ProfileForm(instance=request.user)
+        passwordForm = _stylePasswordForm(PasswordChangeForm(request.user))
+
+    ordersCount = Order.objects.filter(user=request.user).count()
+
+    return render(
+
+        request,
+
+        "marketPlace/profile.html",
+
+        {
+            "profileForm": profileForm,
+            "passwordForm": passwordForm,
+            "ordersCount": ordersCount,
+        }
+
+    )
+
+
+def about(request):
+
+    return render(request, "marketPlace/about.html")
+
+
+def contact(request):
+
+    if request.method == "POST":
+
+        form = ContactForm(request.POST)
+
+        if form.is_valid():
+
+            messages.success(
+                request,
+                "Thanks for reaching out! We'll get back to you soon."
+            )
+
+            return redirect("contact")
+
+    else:
+
+        form = ContactForm()
+
+    return render(request, "marketPlace/contact.html", {"form": form})
+
+
+def newsletterSignup(request):
+
+    if request.method == "POST":
+
+        form = NewsletterForm(request.POST)
+
+        if form.is_valid():
+
+            messages.success(request, "You're subscribed to our newsletter.")
+
+        else:
+
+            messages.error(request, "Please enter a valid email address.")
+
+    return redirect(request.META.get("HTTP_REFERER", "product_list"))

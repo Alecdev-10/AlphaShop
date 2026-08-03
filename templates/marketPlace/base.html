@@ -28,11 +28,47 @@
             Alpha<span>Shop</span>
         </a>
 
+        <form action="{% url 'product_list' %}" method="GET" class="nav-search">
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <input
+                type="text"
+                name="q"
+                placeholder="Search for products..."
+                value="{{ query|default:'' }}"
+            >
+
+        </form>
+
         <nav class="nav-links" id="navMenu">
+
+            <form action="{% url 'product_list' %}" method="GET" class="nav-search nav-search-mobile">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="Search for products..."
+                    value="{{ query|default:'' }}"
+                >
+
+            </form>
 
             <a href="{% url 'product_list' %}">
                 <i class="fa-solid fa-store"></i>
                 Products
+            </a>
+
+            <a href="{% url 'about' %}">
+                <i class="fa-solid fa-circle-info"></i>
+                About
+            </a>
+
+            <a href="{% url 'contact' %}">
+                <i class="fa-solid fa-envelope"></i>
+                Contact
             </a>
 
             {% if user.is_authenticated %}
@@ -51,15 +87,34 @@
 
                 </a>
 
-                <a href="#">
-                    <i class="fa-solid fa-user"></i>
-                    {{ user.username }}
-                </a>
+                <div class="account-menu" id="accountMenu">
 
-                <a href="{% url 'logout' %}">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                    Logout
-                </a>
+                    <button type="button" class="account-trigger" id="accountTrigger">
+                        <i class="fa-solid fa-circle-user"></i>
+                        {{ user.username }}
+                        <i class="fa-solid fa-chevron-down account-caret"></i>
+                    </button>
+
+                    <div class="account-dropdown" id="accountDropdown">
+
+                        <a href="{% url 'profile' %}">
+                            <i class="fa-solid fa-user"></i>
+                            My Profile
+                        </a>
+
+                        <a href="{% url 'orders' %}">
+                            <i class="fa-solid fa-receipt"></i>
+                            My Orders
+                        </a>
+
+                        <a href="{% url 'logout' %}">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Logout
+                        </a>
+
+                    </div>
+
+                </div>
 
             {% else %}
 
@@ -68,7 +123,7 @@
                     Login
                 </a>
 
-                <a href="{% url 'register' %}">
+                <a href="{% url 'register' %}" class="btn btn-primary nav-cta">
                     <i class="fa-solid fa-user-plus"></i>
                     Register
                 </a>
@@ -78,9 +133,7 @@
         </nav>
 
         <div class="menu-btn" id="menuBtn">
-
             <i class="fa-solid fa-bars"></i>
-
         </div>
 
     </div>
@@ -97,6 +150,10 @@
         <div class="alert alert-{{ message.tags }}">
 
             {{ message }}
+
+            <button type="button" class="alert-close" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
 
         </div>
 
@@ -122,17 +179,92 @@
 
 
 
-<footer>
+<footer class="site-footer">
 
-    <div class="container">
+    <div class="container footer-grid">
 
-        <p>
+        <div class="footer-col footer-brand">
 
-            © {% now "Y" %} Alecdev-10.
+            <a href="{% url 'product_list' %}" class="logo">
+                Alpha<span>Shop</span>
+            </a>
 
-            Built with Django
+            <p>
+                Quality tech products at honest prices. Curated gadgets,
+                fast checkout, and a shopping experience built to last.
+            </p>
 
-        </p>
+            <div class="footer-social">
+
+                <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter / X"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+
+            </div>
+
+        </div>
+
+        <div class="footer-col">
+
+            <h4>Quick Links</h4>
+
+            <ul>
+                <li><a href="{% url 'product_list' %}">Products</a></li>
+                <li><a href="{% url 'about' %}">About Us</a></li>
+                <li><a href="{% url 'contact' %}">Contact</a></li>
+            </ul>
+
+        </div>
+
+        <div class="footer-col">
+
+            <h4>My Account</h4>
+
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'profile' %}">My Profile</a></li>
+                    <li><a href="{% url 'show_cart' %}">My Cart</a></li>
+                    <li><a href="{% url 'orders' %}">My Orders</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                {% endif %}
+            </ul>
+
+        </div>
+
+        <div class="footer-col footer-newsletter">
+
+            <h4>Stay in the loop</h4>
+
+            <p>Get notified about new arrivals and deals.</p>
+
+            <form action="{% url 'newsletter_signup' %}" method="POST" class="newsletter-form">
+
+                {% csrf_token %}
+
+                <input type="email" name="email" class="newsletter-input" placeholder="Your email address" required>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="footer-bottom">
+
+        <div class="container">
+
+            <p>
+                © {% now "Y" %} Alecdev-10. Built with Django
+            </p>
+
+        </div>
 
     </div>
 

@@ -36,8 +36,8 @@ Products | AlphaShop
 
         <div class="hero-image">
 
-            <img src="{% static 'marketPlace/images/shopping.png' %}"
-                 alt="Shopping">
+            <img src="{% static 'marketPlace/images/hero-gadgets.jpg' %}"
+                 alt="Latest tech gadgets">
 
         </div>
 
@@ -55,8 +55,51 @@ Products | AlphaShop
 
     </h2>
 
+    {% if query %}
+
+        <div class="search-info">
+
+            <i class="fa-solid fa-magnifying-glass"></i>
+
+            <span>
+                Search results for <strong>&ldquo;{{ query }}&rdquo;</strong>
+            </span>
+
+            <a href="{% url 'product_list' %}">
+                Clear search
+            </a>
+
+        </div>
+
+    {% endif %}
 
     {% if products %}
+
+    <div class="products-toolbar">
+
+        <p class="results-count">
+            <strong>{{ total_count }}</strong>
+            product{{ total_count|pluralize }} found
+        </p>
+
+        <form method="GET" class="sort-select">
+
+            {% if query %}
+                <input type="hidden" name="q" value="{{ query }}">
+            {% endif %}
+
+            <label for="sort">Sort by</label>
+
+            <select name="sort" id="sort" onchange="this.form.submit()">
+                <option value="newest" {% if sort == "newest" %}selected{% endif %}>Newest</option>
+                <option value="price_asc" {% if sort == "price_asc" %}selected{% endif %}>Price: Low to High</option>
+                <option value="price_desc" {% if sort == "price_desc" %}selected{% endif %}>Price: High to Low</option>
+                <option value="name" {% if sort == "name" %}selected{% endif %}>Name: A-Z</option>
+            </select>
+
+        </form>
+
+    </div>
 
     <div class="product-grid">
 
@@ -65,6 +108,10 @@ Products | AlphaShop
         <div class="product-card">
 
             <div class="product-image">
+
+                {% if product.isNew %}
+                    <span class="new-badge">New</span>
+                {% endif %}
 
                 {% if product.image %}
 
@@ -150,23 +197,87 @@ Products | AlphaShop
 
     </div>
 
+    {% if page_obj.paginator.num_pages > 1 %}
+
+        <div class="pagination">
+
+            {% if page_obj.has_previous %}
+
+                <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+
+            {% else %}
+
+                <span class="disabled"><i class="fa-solid fa-chevron-left"></i></span>
+
+            {% endif %}
+
+            {% for pageNumber in page_obj.paginator.page_range %}
+
+                {% if pageNumber == page_obj.number %}
+
+                    <span class="current">{{ pageNumber }}</span>
+
+                {% else %}
+
+                    <a href="?page={{ pageNumber }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">{{ pageNumber }}</a>
+
+                {% endif %}
+
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+
+                <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+
+            {% else %}
+
+                <span class="disabled"><i class="fa-solid fa-chevron-right"></i></span>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
     {% else %}
 
     <div class="empty-state">
 
         <i class="fa-solid fa-box-open"></i>
 
-        <h2>
+        {% if query %}
 
-            No products available
+            <h2>
+                No results for &ldquo;{{ query }}&rdquo;
+            </h2>
 
-        </h2>
+            <p>
+                Try a different keyword or browse all our products.
+            </p>
 
-        <p>
+            <a href="{% url 'product_list' %}" class="btn btn-primary">
+                View all products
+            </a>
 
-            Come back later.
+        {% else %}
 
-        </p>
+            <h2>
+
+                No products available
+
+            </h2>
+
+            <p>
+
+                Come back later.
+
+            </p>
+
+        {% endif %}
 
     </div>
 

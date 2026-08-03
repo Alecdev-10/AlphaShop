@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+from django.utils import timezone
+from datetime import timedelta
 
 
 class Product(models.Model):
@@ -40,6 +42,10 @@ class Product(models.Model):
             self.slug = slugify(self.name)
 
         super().save(*args, **kwargs)
+
+    @property
+    def isNew(self):
+        return self.createdAt >= timezone.now() - timedelta(days=7)
 
     def __str__(self):
         return self.name

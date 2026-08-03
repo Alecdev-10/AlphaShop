@@ -1,0 +1,100 @@
+{% extends 'marketPlace/base.html' %}
+{% load static %}
+
+{% block title %}
+About Us | AlphaShop
+{% endblock %}
+
+{% block content %}
+
+<section class="section">
+
+    <div class="breadcrumbs">
+
+        <a href="{% url 'product_list' %}">Products</a>
+        <i class="fa-solid fa-chevron-right" style="font-size:.7rem;"></i>
+        <span class="current">About Us</span>
+
+    </div>
+
+    <div class="about-hero">
+
+        <img src="{% static 'marketPlace/images/about-lifestyle.jpg' %}" alt="AlphaShop team at work">
+
+        <div class="about-hero-overlay">
+
+            <h1>Built for people who love good tech</h1>
+
+            <p>
+                AlphaShop started as a simple idea: make quality tech
+                accessible, without the markup or the guesswork.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="about-content">
+
+        <div>
+
+            <h2>Our story</h2>
+
+            <p>
+                AlphaShop is an independent online store focused on curated
+                tech products &mdash; laptops, audio gear, peripherals, and
+                accessories that are genuinely worth your money. We test what
+                we sell and keep our catalog small on purpose.
+            </p>
+
+            <p>
+                No filler products, no dark patterns, no pressure. Just a
+                clean shopping experience, honest pricing, and a team that
+                actually answers your messages.
+            </p>
+
+        </div>
+
+        <img src="{% static 'marketPlace/images/hero-gadgets-dark.jpg' %}" alt="Curated tech products">
+
+    </div>
+
+    <h2 class="section-title">Why shop with us</h2>
+
+    <div class="value-grid">
+
+        <div class="value-card">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <h3>Quality guaranteed</h3>
+
+            <p>Every product is checked for quality before it reaches our catalog.</p>
+
+        </div>
+
+        <div class="value-card">
+
+            <i class="fa-solid fa-truck-fast"></i>
+
+            <h3>Fast shipping</h3>
+
+            <p>Orders are processed quickly so you get your gear without the wait.</p>
+
+        </div>
+
+        <div class="value-card">
+
+            <i class="fa-solid fa-headset"></i>
+
+            <h3>Real support</h3>
+
+            <p>Questions or issues? Our team is one message away on the contact page.</p>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
