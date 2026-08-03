@@ -187,3 +187,29 @@ CSRF_TRUSTED_ORIGINS = [o.strip() for o in csrf_origins.split(",")] if csrf_orig
 
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
+
+
+# Logging
+# Django's default logging config only prints request errors to the
+# console when DEBUG=True, so 500s are otherwise invisible in the Render
+# logs. Force unhandled exceptions to always be logged with a traceback.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
